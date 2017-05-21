@@ -1,0 +1,31 @@
+pkgname=dmtcp
+pkgver=2.5.0
+pkgrel=1
+pkgdesc='DMTCP: Distributed MultiThreaded CheckPointing'
+arch=('x86_64')
+license=('GPL3')
+url='http://dmtcp.github.io/'
+depends=('gcc' 'make')
+source=("https://github.com/dmtcp/dmtcp/archive/${pkgver}.tar.gz"
+        'python2.patch')
+md5sums=('SKIP'
+         'SKIP')
+
+prepare(){
+    cd $srcdir/$pkgname-$pkgver
+
+    patch -p0 -i $srcdir/python2.patch
+}
+
+build() {
+    cd $srcdir/$pkgname-$pkgver
+
+    ./configure --prefix=/opt/dmtcp
+    make
+}
+
+package() {
+    cd $srcdir/$pkgname-$pkgver
+
+    make DESTDIR="$pkgdir" install
+}
