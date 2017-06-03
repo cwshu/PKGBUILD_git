@@ -5,27 +5,35 @@ pkgdesc='DMTCP: Distributed MultiThreaded CheckPointing'
 arch=('x86_64')
 license=('GPL3')
 url='http://dmtcp.github.io/'
-depends=('gcc' 'make')
-source=("https://github.com/dmtcp/dmtcp/archive/${pkgver}.tar.gz"
-        'python2.patch')
-md5sums=('SKIP'
-         'SKIP')
+makedepends=('gcc' 'make')
+source=("https://github.com/dmtcp/dmtcp/archive/${pkgver}.tar.gz")
+md5sums=('SKIP')
 
-prepare(){
+prepare() {
     cd $srcdir/$pkgname-$pkgver
 
-    patch -p0 -i $srcdir/python2.patch
+    # replace python with python2
+    sed "s|python|\02|" -i Makefile.in configure.ac
+    sed "s|python|\02|" -i contrib/python/*.py util/*.py
+    sed "s#\(env \|\"\|/\)python#\02#g" -i test/autotest.py
 }
 
 build() {
     cd $srcdir/$pkgname-$pkgver
 
-    ./configure --prefix=/opt/dmtcp
+    ./configure --prefix=/usr/
     make
 }
+
+# check() {
+#     cd $srcdir/$pkgname-$pkgver
+# 
+#     make check
+# }
 
 package() {
     cd $srcdir/$pkgname-$pkgver
 
     make DESTDIR="$pkgdir" install
+    install -D -m644 COPYING $pkgdir/usr/share/licenses/$pkgname/COPYING
 }
